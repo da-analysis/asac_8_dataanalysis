@@ -36,6 +36,7 @@ Projects 안에서 프로젝트 단위로 issue 단위로 확인할 예정입니
 
 Git 정책 가이드
 코드리뷰 가이드
+https://github.com/da-analysis/asac_8_dataanalysis/blob/main/PR_Guide.md
 
 - - -
 ### Contributors
