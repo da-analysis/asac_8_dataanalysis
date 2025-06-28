@@ -1,0 +1,20 @@
+name: Slack Comment Notifier
+
+on:
+  issue_comment:
+  pull_request_review_comment:
+
+jobs:
+  notify-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Comment to Slack
+        if: github.event.action == 'created'
+        run: |
+          echo '{}' | jq --arg user "${{ github.actor }}" \
+                         --arg body "${{ github.event.comment.body }}" \
+                         --arg url "${{ github.event.comment.html_url }}" \
+              '.text = "*:speech_balloon: \($user) commented:*\n\n>\($body)\n\n🔗 <\($url)|코멘트 바로 가기>"' > payload.json
+          curl -X POST -H 'Content-type: application/json' --data @payload.json ${{ secrets.SLACK_WEBHOOK_URL }}
+
+
