@@ -27,7 +27,6 @@ Projects 안에서 프로젝트 단위로 issue 단위로 확인할 예정입니
 - - -
 
 ### Ground Rules
-
 1. **[ISSUE-ID][커밋 태그] 내용** / 커밋 태그 : Add, Fix, Change, Improve, Migrate 중 하나로 업로드 합니다. 
 2. branch 는 트렁크 기반 개발 전략을 따릅니다. (https://tech.mfort.co.kr/blog/2022-08-05-trunk-based-development/)
 3. 디펜던시 관리가 필요한 모듈/라이브러리 환경을 기록한다.
@@ -40,5 +39,4 @@ https://github.com/da-analysis/asac_8_dataanalysis/blob/main/PR_Guide.md
 
 - - -
 ### Contributors
-
 *syleeie*
