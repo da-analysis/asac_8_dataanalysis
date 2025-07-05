@@ -39,5 +39,5 @@ https://github.com/da-analysis/asac_8_dataanalysis/blob/main/PR_Guide.md
 
 - - -
 ### Contributors
-*syleeie*,*hongin12*,*songhee*,*orichardev*
+*syleeie*,*hongin12*,*songhee*,*orichardev*, *byeonwoojung*
 
