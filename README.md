@@ -39,4 +39,4 @@ https://github.com/da-analysis/asac_8_dataanalysis/blob/main/PR_Guide.md
 
 - - -
 ### Contributors
-*syleeie*
+*syleeie*, *hongin12*
