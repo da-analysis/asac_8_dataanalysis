@@ -109,6 +109,7 @@ def run_metric_analysis(
     needs: str,
     brand_no: str,
     brand_name: str,
+    brand_context: Optional[Dict[str, Any]] = None,\
     openai_api_key: Optional[str] = None,
     model: str = MODEL,
 ) -> Dict[str, Any]:
@@ -123,7 +124,7 @@ def run_metric_analysis(
         raise RuntimeError("OpenAI API 키가 필요합니다.")
     client = OpenAI(api_key=openai_api_key)
 
-    # 업종 요약 로드(선택)
+    # 업종 요약 로드
     try:
         industry_summary_df = spark.table(INDUSTRY_SUMMARY_TABLE)
         industry_rows = (
@@ -137,12 +138,16 @@ def run_metric_analysis(
         industry_context_json = "{}"
 
     # 컨텍스트
-    context_json = json.dumps({
-        "공정위_등록번호": brand_no,
-        "공정위_영업표지_브랜드명": brand_name,
-        "시도": sido,
-        "시군구": sigungu,
-    }, ensure_ascii=False)
+    if brand_context:
+        context_json = json.dumps(_row_to_context_dict(brand_context), ensure_ascii=False)
+    else:    # 비어있는 경우 최소 정보를 줌
+        context_json = json.dumps({
+            "공정위_등록번호": brand_no,
+            "공정위_영업표지_브랜드명": brand_name,
+            "시도": sido,
+            "시군구": sigungu,
+        }, ensure_ascii=False)
+
 
     # 프롬프트 주입
     user_prompt = USER_PROMPT.format(
@@ -164,7 +169,7 @@ def run_metric_analysis(
             {"role": "user", "content": user_prompt},
         ],
         response_format={"type": "json_object"},
-        max_tokens=8000,
+        max_completion_tokens=8000,
     )
 
     raw_text = (resp.choices[0].message.content or "").strip()

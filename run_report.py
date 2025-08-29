@@ -93,6 +93,7 @@ def run_pipeline() -> List[Dict[str, Any]]:
                     needs=user_input["needs"],
                     brand_no=brand_no,
                     brand_name=brand_name,
+                    brand_context=brand_row,
                 )
             )
 

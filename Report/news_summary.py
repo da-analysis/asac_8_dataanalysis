@@ -270,6 +270,8 @@ def run_news_summary(
             art["fulltext"] = art["fulltext"][:1500]
         articles_with_ids.append(art)
 
+    # 브랜드 행데이터 제공/ 없으면 기본적으로 등록번호, 브랜드명은 줌
+    # 브랜드 행데이터에서 프롬프트를 통해 "공정위_업종분류", "배민_업종분류", "본사_상호명", "브랜드_소개내용_1", "브랜드_장점및노하우"를 보조지표로 이용함
     brand_context_json = json.dumps(brand_context or {
         "공정위_등록번호": brand_no,
         "공정위_영업표지_브랜드명": brand_name,
@@ -290,7 +292,7 @@ def run_news_summary(
             {"role": "user", "content": user_prompt},
         ],
         response_format={"type": "json_object"},
-        max_tokens=max_output_tokens,
+        max_completion_tokens=max_output_tokens,
     )
 
     raw_output = (resp.choices[0].message.content or "").strip()
