@@ -353,7 +353,7 @@ def run_summary_report(
             {"role": "user", "content": summary_user_filled},
         ],
         response_format={"type": "json_object"},
-        max_tokens=8000,
+        max_completion_tokens=8000,
     )
 
     summary_raw = (resp.choices[0].message.content or "").strip()
