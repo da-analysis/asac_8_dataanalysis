@@ -157,16 +157,17 @@ def run_metric_analysis(
     )
 
     # OpenAI 호출
-    resp = client.responses.create(
+    resp = client.chat.completions.create(
         model=model,
-        instructions=SYSTEM_PROMPT,
-        input=user_prompt,
-        reasoning={"effort": "minimal"},
-        text={"verbosity": "medium"},
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT + "\n\n추론은 최소한으로 수행하면서 효율적으로 하세요. 응답은 간결하게 작성하세요."},
+            {"role": "user", "content": user_prompt},
+        ],
         response_format={"type": "json_object"},
-        max_output_tokens=8000,
+        max_tokens=8000,
     )
-    raw_text = (getattr(resp, "output_text", "") or "").strip()
+
+    raw_text = (resp.choices[0].message.content or "").strip()
     if not raw_text:
         raise RuntimeError("모델 응답이 비어 있습니다.")
 

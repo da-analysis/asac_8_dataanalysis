@@ -346,17 +346,17 @@ def run_summary_report(
         rent_hier_json=rent_hier_json,
     )
 
-    resp = client.responses.create(
+    resp = client.chat.completions.create(
         model=summary_model,
-        instructions=SUMMARY_SYSTEM_PROMPT,
-        input=summary_user_filled,
-        reasoning={"effort": "minimal"},
-        text={"verbosity": "low"},
+        messages=[
+            {"role": "system", "content": SUMMARY_SYSTEM_PROMPT + "\n\n추론은 최소한으로 수행하면서 효율적으로 하세요. 응답은 간결하게 작성하세요."},
+            {"role": "user", "content": summary_user_filled},
+        ],
         response_format={"type": "json_object"},
-        max_output_tokens=8000,
+        max_tokens=8000,
     )
 
-    summary_raw = (getattr(resp, "output_text", "") or "").strip()
+    summary_raw = (resp.choices[0].message.content or "").strip()
     if not summary_raw:
         raise RuntimeError("요약보고서 응답이 비어 있습니다.")
 
