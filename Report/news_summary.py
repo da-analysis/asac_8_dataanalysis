@@ -283,18 +283,18 @@ def run_news_summary(
 
     # OpenAI 호출
     client = OpenAI(api_key=openai_api_key)
-    resp = client.responses.create(
+    resp = client.chat.completions.create(
         model=openai_model,
-        instructions=NEWS_SUMMARY_SYSTEM_PROMPT,
-        input=user_prompt,
-        reasoning={"effort": "minimal"},
-        text={"verbosity": "low"},
+        messages=[
+            {"role": "system", "content": NEWS_SUMMARY_SYSTEM_PROMPT + "\n\n추론은 최소한으로 수행하면서 효율적으로 하세요. 응답은 간결하게 작성하세요."},
+            {"role": "user", "content": user_prompt},
+        ],
         response_format={"type": "json_object"},
-        max_output_tokens=max_output_tokens,
+        max_tokens=max_output_tokens,
     )
 
-    # 파싱
-    raw_output = (getattr(resp, "output_text", "") or "").strip()
+    raw_output = (resp.choices[0].message.content or "").strip()
+
     if not raw_output:
         raise RuntimeError("뉴스 요약 응답이 비어 있습니다.")
     try:
