@@ -1,5 +1,5 @@
 # Databricks notebook source
-# run_pipeline.py
+# run_report.py
 from __future__ import annotations
 
 from typing import List, Dict, Any
