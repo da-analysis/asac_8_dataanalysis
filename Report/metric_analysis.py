@@ -62,7 +62,7 @@ def _load_industry_summary_row(industry: str) -> dict:
     q = f"""
     SELECT *
     FROM {INDUSTRY_SUMMARY_TABLE}
-    WHERE `공정위_업종분류` = {{p0}}   -- ✅ 한글 컬럼 backtick
+    WHERE `공정위_업종분류` = {{p0}}
     LIMIT 1
     """
     df = _fetch_one_df(q, params=(industry,))
@@ -103,7 +103,7 @@ SYSTEM_PROMPT = (
         "초기창업비용_기타비용_포함항목 컬럼 값이 공백 또는 null인 경우, 기타비용 포함항목을 알 수 없는 상태이므로 별도로 어떤 값이 포함된 것인지 설명하지 않아도 됨.\n "
         "예치금은 본부가 예치기관(은행 등)을 통해 받아야 하는 법적 보호 장치가 걸린 최소 금액임.(가맹본사의 지원을 보장받기 위한 안전장치임)\n "
     "9) 최종 출력은 반드시 유효한 JSON 객체여야 하며, key는 분석 항목명(예: 최초가맹비용, 초기창업비용, 월평균매출액, 예치금, 3C_분석, SWOT 분석 등)이고, "
-        "value는 각 항목에 대한 분석 결과 문자열(250자 이내)입니다."
+        "value는 각 항목에 대한 분석 결과 문자열(250자 이내)입니다.\n"
 )
 
 USER_PROMPT = (
