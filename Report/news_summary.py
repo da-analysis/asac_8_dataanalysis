@@ -50,7 +50,6 @@ NEWS_SUMMARY_SYSTEM_PROMPT = """
       "why_relevant": "<string>", "pub_date": "YYYY-MM-DD", "publisher": "<string>", "url": "<string>" }
   ],
   "overall_summary": "<string>",
-  "sources": [ { "id": <int>, "title": "<string>", "publisher": "<string>", "url": "<string>" } ],
   "notes": "<string>"
 }
 
@@ -72,7 +71,6 @@ NEWS_SUMMARY_USER_PROMPT = """
 - relevance를 내부적으로 판단해 높은 순으로 정렬 후 최대 5개만 selected에 포함.
 - **각 selected 항목에 title(기사 제목), summary(2~3문장 요약), why_relevant, pub_date, publisher, url을 반드시 포함.**
 - why_relevant에는 가능한 경우 판별에 사용한 단서(브랜드명/업종/본사상호 등)를 간단히 근거로 남기세요.
-- sources에는 selected의 id/title/publisher/url을 그대로 다시 나열.
 - overall_summary는 400자 내로 작성.
 - 반드시 JSON 객체만 반환.
 
@@ -106,7 +104,7 @@ def fetch_naver_news_recent_by_brand(
     *,
     naver_client_id: str,
     naver_client_secret: str,
-    days: int = 14,
+    days: int = 180,
     per_page: int = 20,
     pages: int = 4,
     include_corp: bool = True,
@@ -223,7 +221,7 @@ def run_news_summary(
     openai_api_key: Optional[str] = None,
     openai_model: str = "gpt-5-mini",
     max_output_tokens: int = 4000,
-    days: int = 14,
+    days: int = 180,
     per_page: int = 20,
     pages: int = 4,
     max_items: int = 20,
