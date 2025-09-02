@@ -57,11 +57,7 @@ def _fetch_one_df(query: str, params: tuple = ()) -> pd.DataFrame:
 
 # ===== list-of-pairs → dict-of-dicts 정규화 =====
 def _pairs_to_nested_dict(x) -> dict:
-    """
-    입력 예: [('구월', [('소규모상가', 23500.0), ('중대형상가', 16700.0)]) , ...]
-    출력 예: {'구월': {'소규모상가':23500.0, '중대형상가':16700.0}, ...}
-    이미 dict면 그대로 반환. 문자열 JSON이면 파싱.
-    """
+    
     if x is None:
         return {}
     # 문자열 JSON → 파싱
@@ -156,18 +152,22 @@ SUMMARY_SYSTEM_PROMPT = (
     "   - 용도: 브랜드 데이터와 업종 데이터를 바탕으로 추출된 핵심 지표 요약.\n"
     "   - 창업비용, 매출, 로열티/광고비, 강점/리스크 요약, 컨설팅 방법론별 분석 등을 포함.\n"
     "3) 규모별 임대료 계층 요약(JSON, 입력 제공)\n"
-    "   - 각 규모(소/중/대)별 면적구간(하한/상한/대표면적/사업장수)과,\n"
-    "   - (상권×표본구분) 및 (상권×조사층)별 m²당 월세의 하한/상한을 면적구간에 곱해 계산한 월임대료·보증금의 '범위'.\n"
-    "   - 산식: 월임대료_min= 하한_m²당월세 × 면적하한, 월임대료_max= 상한_m²당월세 × 면적상한. 보증금은 각 ×10.\n"
+    "   - 각 규모(소/중/대)별 면적구간(하한·상한)으로부터 중앙값을 계산하고, 이를 기준면적(면적구간_중앙값_m2)으로 사용함.\n"
+    "   - (상권×표본구분) 및 (상권×조사층)별 m²당 월세 하한·상한에 이 중앙값을 곱해 월임대료 범위를 산출한 것.\n"
+    "   - 계산식: \n"
+    "   월임대료_min = (m²당 월세 하한) × (면적구간 중앙값[m²]),\n"
+    "   월임대료_max = (m²당 월세 상한) × (면적구간 중앙값[m²]),\n"
+    "   임대보증금 범위 = 각 월임대료 값 × 10\n"
     "\n"
     "[작성 원칙]\n"
     "- 모든 문장은 한국어로 작성하며 잘 읽히도록 작성."
     "- 대상 고객(40~50대, 70~80%)에 맞춰 간결·근거 기반으로 작성(과장/추측 금지).\n"
     "- 금액 단위는 '원/만원/억'만 사용. 값이 없거나 불확실하면 '자료가 없습니다.'.\n"
+    "- 수치 데이터는 ,를 통한 구분기호 처리 필수.'.\n"
     "- 우선순위: 브랜드 고유 수치 > 1차 지표분석_JSON.\n"
+    "- 1차 지표분석_JSON(1차 분석 요약)을 반드시 참고하여 답변.\n"
     "- **'임대료_세부' 섹션은 출력하지 않습니다.**\n"
     "- **추천임대료_및_이유**는 임대료 계층 데이터를 근거로 **'범위'만** 제시(대표값/제곱미터당 월세 출력 금지).\n"
-    "- 1차 지표분석_JSON(1차 분석 요약)을 반드시 참고.\n"
     "- '로얄티'와 '광고_판촉비'는 내용이 있을 때만 작성하고, 없으면 '자료가 없습니다.'\n"
     "- '브랜드_강점', '브랜드_리스크', '권고사항' 작성할 때만, 수치는 각 문장의 끝에 괄호 ()을 사용하여 표시.(ex. 'OO브랜드의 월평균매출액이 OO업종 대비 약 20% 높습니다.(OO브랜드 매출액: 1억 2000천만원, OO업종 6천만원)')\n"
     "- '브랜드_소개_및_강점_키워드', '투자분석_키워드', '실행전략_키워드'는 띄어쓰기 없는 짧은 키워드를 최대 5개 작성하고, 해당 브랜드의 차별화된 핵심 키워드를 작성.(형용사적 표현 가능. ex.지원혜택많은, 지속성장하는)\n"
@@ -185,7 +185,7 @@ SUMMARY_SYSTEM_PROMPT = (
     "   '추천임대료_및_이유': ["
         "{"
             "'점포규모': '소규모' | '중규모' | '대규모', "
-            "'면적구간': 'A㎡~B㎡', "
+            "'면적구간_중앙값_m2': 'A', "
             "'상권': '상권명', "
             "'추천유형': '표본구분' | '조사층', "
             "'표본구분': '집합상가|단독상가|복합상가|...' | null, "
@@ -205,36 +205,6 @@ SUMMARY_SYSTEM_PROMPT = (
     "8) '투자분석_키워드': 배열\n"
     "9) '실행전략_키워드': 배열\n"
 
-)
-
-SUMMARY_USER_PROMPT = (
-    "[사용자 입력]\n"
-    "- 시도: {sido}\n"
-    "- 시군구: {sigungu}\n"
-    "- 업종: {industry}\n"
-    "- 임대료_및_임대보증금_제외_창업비용: {budget}\n"
-    "- 니즈사항: {needs}\n\n"
-    "[대상 브랜드]\n"
-    "- 공정위_등록번호: {brand_no}\n"
-    "- 공정위_영업표지_브랜드명: {brand_name}\n\n"
-    "[1차 지표분석_JSON]\n"
-    "{metric_analysis_json}\n\n"
-    "[브랜드 행 데이터(JSON 일부 길이 제한)]\n"
-    "{context_json}\n\n"
-    "[규모별 임대료 계층 요약(JSON)]\n"
-    "{rent_hier_json}\n\n"
-    "[상권 허용 목록]\n"
-    "{allowed_markets}\n\n"
-    "[생성 지침]\n"
-    "- 반드시 유효한 JSON 객체만 출력하세요.\n"
-    "- **'임대료_세부' 섹션은 작성하지 않습니다.**\n"
-    "- '추천임대료_및_이유'는 규모(소/중/대) 내에서 (상권×표본구분) 또는 (상권×조사층) 케이스를 활용해 **범위(최소원~최대원)**만 제시하세요.\n"
-    "- **'상권' 값은 위 [상권 허용 목록] 중에서만 선택하세요. 행정구역명(시도/시군구 등)은 상권으로 사용 금지.**\n"
-    "- [상권 허용 목록]이 비어 있으면 '추천임대료_및_이유'는 빈 배열([])로 두세요.\n"
-    "- 각 규모에서 예산·니즈에 적합한 상권&표본구분, 상권&조사층을 1~2개 추천하고 추천 사유를 반영하세요.\n"
-    "- 금액은 정수 원 반올림, 범위는 ‘1500만원~3000만원’처럼 물결(~) 표기.\n"
-    "- 로얄티/광고·판촉비는 값이 있을 때만 제시, 없으면 '자료가 없습니다.'.\n"
-    "- 40~50대 예비창업자에게 간결하고 근거 기반으로 작성하세요.\n"
 )
 
 # ===== 보조 =====
@@ -290,20 +260,23 @@ def _pretty_floor(name: str) -> str:
 def _won(x):
     return int(round(float(x))) if x is not None else None
 
-def _rent_block_from_per_m2(per_m2_low, per_m2_high, _per_m2_avg_unused, lo_m2, hi_m2):
-    if (per_m2_low is None and per_m2_high is None) or (lo_m2 is None and hi_m2 is None):
+def _rent_block_from_per_m2_mid(per_m2_low, per_m2_high, _per_m2_avg_unused, mid_m2):
+    """
+    월임대료_범위 = [ per_m2_low × mid_m2,  per_m2_high × mid_m2 ]
+    임대보증금_범위 = 각 월임대료의 10배
+    """
+    if (per_m2_low is None and per_m2_high is None) or (mid_m2 is None):
         return None
-    min_m2 = lo_m2 if lo_m2 is not None else hi_m2
-    max_m2 = hi_m2 if hi_m2 is not None else lo_m2
-    min_rent = _won(per_m2_low  * min_m2) if (per_m2_low  is not None and min_m2 is not None) else None
-    max_rent = _won(per_m2_high * max_m2) if (per_m2_high is not None and max_m2 is not None) else None
+    min_rent = _won(per_m2_low  * mid_m2) if per_m2_low  is not None else None
+    max_rent = _won(per_m2_high * mid_m2) if per_m2_high is not None else None
     min_dep  = _won(min_rent * 10) if min_rent is not None else None
     max_dep  = _won(max_rent * 10) if max_rent is not None else None
     return {
-        "면적_범위_m2": [min_m2, max_m2],
+        "면적구간_중앙값_m2": mid_m2,
         "월임대료_범위": [min_rent, max_rent],
         "임대보증금_범위": [min_dep, max_dep],
     }
+
 
 # ===== 임대료 계층 생성 =====
 def _build_rent_hier_json(
@@ -334,21 +307,23 @@ def _build_rent_hier_json(
 
     area_items_ext: List[Dict[str, Any]] = []
     if area_bucket_map:
-        parsed = []
         items = area_bucket_map.items() if hasattr(area_bucket_map, "items") else dict(area_bucket_map).items()
+        parsed = []
         for k, cnt in items:
             info = _parse_range_key_ext(k)
             if info["lo"] is None and info["hi"] is None:
                 continue
-            mid = ((info["lo"] + info["hi"]) / 2.0) if (info["lo"] is not None and info["hi"] is not None) \
-                  else (info["lo"] if info["lo"] is not None else info["hi"])
+            # 중앙값 계산
+            if info["lo"] is not None and info["hi"] is not None:
+                mid = (info["lo"] + info["hi"]) / 2.0
+            else:
+                mid = info["lo"] if info["lo"] is not None else info["hi"]
             parsed.append({
-                "면적구간": info["label"],
-                "하한": info["lo"], "상한": info["hi"],
-                "대표면적_m2": round(mid, 2) if mid is not None else None,
+                "면적구간_중앙값_m2": round(mid, 2) if mid is not None else None,
                 "사업장수": int(cnt) if cnt is not None else 0,
             })
-        parsed.sort(key=lambda x: (x["대표면적_m2"] if x["대표면적_m2"] is not None else float("inf")))
+
+        parsed.sort(key=lambda x: (x["면적구간_중앙값_m2"] is None, x["면적구간_중앙값_m2"]))
         labels = ["소규모", "중규모", "대규모"]
         for i, it in enumerate(parsed[:3]):
             it["구분"] = labels[i] if i < len(labels) else f"규모{i+1}"
@@ -359,26 +334,25 @@ def _build_rent_hier_json(
 
     rent_hier = []
     for a in area_items_ext:
-        lo, hi = a["하한"], a["상한"]
+        mid = a["면적구간_중앙값_m2"]
         size_block = {
             "구분": a["구분"],
-            "면적구간": a["면적구간"],
-            "대표면적_m2": a["대표면적_m2"],
+            "면적구간_중앙값_m2": mid,
             "사업장수": a["사업장수"],
             "표본구분_상권별": [],
             "조사층_상권별": [],
         }
 
-        # 표본구분 기준
+        # === 표본구분 기준 ===
         for market_name_raw, inner_avg in (S_avg or {}).items():
             market_name = _normalize_market_name(market_name_raw)
             low_map  = S_low.get(market_name_raw, {})  if isinstance(S_low, dict)  else {}
             high_map = S_high.get(market_name_raw, {}) if isinstance(S_high, dict) else {}
             for sample_name, avg_val in (inner_avg or {}).items():
-                block = _rent_block_from_per_m2(
-                    (low_map.get(sample_name)  if isinstance(low_map, dict)  else None),
-                    (high_map.get(sample_name) if isinstance(high_map, dict) else None),
-                    avg_val, lo, hi
+                block = _rent_block_from_per_m2_mid(
+                    low_map.get(sample_name) if isinstance(low_map, dict) else None,
+                    high_map.get(sample_name) if isinstance(high_map, dict) else None,
+                    avg_val, mid
                 )
                 if block:
                     size_block["표본구분_상권별"].append({
@@ -387,16 +361,16 @@ def _build_rent_hier_json(
                         **block
                     })
 
-        # 조사층 기준
+        # === 조사층 기준 ===
         for market_name_raw, inner_avg in (F_avg or {}).items():
             market_name = _normalize_market_name(market_name_raw)
             low_map  = F_low.get(market_name_raw, {})  if isinstance(F_low, dict)  else {}
             high_map = F_high.get(market_name_raw, {}) if isinstance(F_high, dict) else {}
             for floor_name_raw, avg_val in (inner_avg or {}).items():
-                block = _rent_block_from_per_m2(
-                    (low_map.get(floor_name_raw)  if isinstance(low_map, dict)  else None),
-                    (high_map.get(floor_name_raw) if isinstance(high_map, dict) else None),
-                    avg_val, lo, hi
+                block = _rent_block_from_per_m2_mid(
+                    low_map.get(floor_name_raw) if isinstance(low_map, dict) else None,
+                    high_map.get(floor_name_raw) if isinstance(high_map, dict) else None,
+                    avg_val, mid
                 )
                 if block:
                     size_block["조사층_상권별"].append({
@@ -405,12 +379,13 @@ def _build_rent_hier_json(
                         **block
                     })
 
+        # 정렬 유지
         def _sort_key_monthly_range(x):
             rng = x.get("월임대료_범위") or [None, None]
             lo_ = rng[0] if len(rng) > 0 else None
             hi_ = rng[1] if len(rng) > 1 else None
-            mid = (lo_ + hi_) / 2 if (lo_ is not None and hi_ is not None) else (lo_ if lo_ is not None else hi_)
-            return (mid is None, mid)
+            mid_ = (lo_ + hi_) / 2 if (lo_ is not None and hi_ is not None) else (lo_ if lo_ is not None else hi_)
+            return (mid_ is None, mid_)
 
         size_block["표본구분_상권별"].sort(key=_sort_key_monthly_range)
         size_block["조사층_상권별"].sort(key=_sort_key_monthly_range)
@@ -418,6 +393,7 @@ def _build_rent_hier_json(
         rent_hier.append(size_block)
 
     return json.dumps(rent_hier, ensure_ascii=False)
+
 
 # 허용 상권 목록 추출
 def _allowed_markets_from_hier_json(rent_hier_json: str) -> list[str]:
@@ -519,7 +495,7 @@ def run_summary_report(
             {"role": "user", "content": summary_user_filled},
         ],
         response_format={"type": "json_object"},
-        max_completion_tokens=14000,
+        max_completion_tokens=16000,
     )
     summary_raw = (resp.choices[0].message.content or "").strip()
     if not summary_raw:
