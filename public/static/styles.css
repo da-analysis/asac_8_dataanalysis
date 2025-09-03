@@ -1,0 +1,372 @@
+/* public/static/styles.css */
+/* 프랜차이즈 브랜드 추천 서비스 커스텀 스타일 */
+
+/* 40-50대 사용자를 위한 접근성 개선 스타일 */
+
+/* 기본 폰트 크기 증가 */
+body {
+    background: #faf5f0;
+    /* 기존: 'Malgun Gothic', Arial, sans-serif; */
+    font-family: 'Noto Sans KR', 'Pretendard', -apple-system, BlinkMacSystemFont,
+               'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Apple SD Gothic Neo',
+               'Noto Sans', 'Malgun Gothic', sans-serif;
+    font-weight: 400;
+}
+
+header h1,
+section h2 {
+    font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
+    font-weight: 800;          /* 굵게 */
+    letter-spacing: -0.01em;   /* 살짝 조여서 깔끔한 인상 */
+}
+
+/* 2-3) 버튼류는 라운디드 산세리프 톤을 유지 + 가독성 굵기 */
+/* .submit-btn {
+  font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
+  font-weight: 600;          /* 버튼은 500~600이 안정적 */
+/*} */
+/* 칩형 버튼 공통 톤 */
+.industry-btn,
+.budget-btn,
+.submit-btn {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.5rem 0.9rem;        /* px-3 py-2 느낌 */
+  border: 1px solid #e5e7eb;     /* gray-200 */
+  border-radius: 0.6rem;         /* rounded-lg~xl 사이 */
+  background: #fff;
+  color: #111827;                /* gray-900 */
+  font-family: 'Noto Sans KR','Pretendard',-apple-system,BlinkMacSystemFont,
+               'Segoe UI',Roboto,'Helvetica Neue',Arial,'Apple SD Gothic Neo',
+               'Noto Sans','Malgun Gothic',sans-serif;
+  font-weight: 500;              /* 버튼은 500~600 안정 */
+  font-size: 0.95rem;            /* text-sm~base 사이 */
+  line-height: 1.15;             /* leading-tight */
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: transform .08s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+  /* 글자 잘림 방지 포인트들 */
+  overflow: visible;
+  white-space: normal;           /* 버튼 안 줄바꿈 허용 */
+  word-break: keep-all;          /* 한국어 단어 중간 끊김 방지 */
+}
+
+/* hover/focus 상태를 또렷하게 */
+.industry-btn:hover,
+.budget-btn:hover {
+  border-color: #f97316;         /* orange-500 */
+  box-shadow: 0 1px 6px rgba(249, 115, 22, .12);
+  transform: translateY(-1px);
+}
+
+.industry-btn:focus-visible,
+.budget-btn:focus-visible {
+  outline: 3px solid rgba(249, 115, 22, .35);
+  outline-offset: 2px;
+}
+
+/* 선택 상태(앱에서 .selected 토글) */
+.industry-btn.selected,
+.budget-btn.selected {
+  background: #f97316;           /* orange-500 */
+  color: #fff;
+  border-color: #f97316;
+  box-shadow: 0 2px 10px rgba(249, 115, 22, .2);
+  font-weight: 600;
+}
+
+/* 모바일에서 버튼 간격이 너무 붙지 않도록 */
+#industryButtons, #budgetButtons {
+  row-gap: .5rem;
+  column-gap: .5rem;
+}
+
+
+/* 2-4) 폼 컨트롤 텍스트(선택지/입력 내용)도 동일 계열로 */
+.form-select,
+.form-textarea {
+  font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
+  font-weight: 400;
+}
+
+/* 2-5) 플레이스홀더는 얇고 연하게 (Light 톤) */
+.form-textarea::placeholder,
+.form-select::placeholder {
+  font-weight: 300;          /* Light */
+  color: #9ca3af;            /* Tailwind gray-400 정도 */
+  opacity: 1;                /* 사파리 등에서 연하게 보이는 것 방지 */
+}
+
+/* (선택) 카드/본문 가독성 소폭 개선 */
+h3, h4, h5, h6 {
+  letter-spacing: -0.005em;
+}
+
+/* 큰 텍스트 클래스 */
+.large-text {
+    font-size: 1.125rem;
+    line-height: 1.7;
+}
+
+.extra-large-text {
+    font-size: 1.25rem;
+    line-height: 1.7;
+}
+
+/* 버튼 스타일 */
+.button-large {
+    padding: 14px 28px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    border: none;
+}
+
+.button-large:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.button-large:active {
+    transform: translateY(0);
+}
+
+.button-large:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 폼 입력 요소 */
+.form-input-large {
+    padding: 14px 16px;
+    font-size: 1.125rem;
+    border-radius: 8px;
+    border: 2px solid #d1d5db;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-input-large:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 카드 스타일 */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+/* 그라데이션 배경 */
+.gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 로딩 애니메이션 개선 */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading-text {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 결과 카드 애니메이션 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* 점수 표시 스타일 */
+.score-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.score-high {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.score-medium {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.score-low {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* 뱃지 스타일 */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.badge-success {
+    background-color: #d1fae5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.badge-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.badge-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+/* 뉴스 아이템 스타일 */
+.news-item {
+    border-left: 4px solid #3b82f6;
+    padding-left: 16px;
+    margin-bottom: 16px;
+}
+
+.news-title {
+    font-weight: 600;
+    color: #1f2937;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+.news-title:hover {
+    color: #3b82f6;
+    text-decoration: underline;
+}
+
+/* 섹션 분리선 */
+.section-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #d1d5db, transparent);
+    margin: 32px 0;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .large-text {
+        font-size: 1rem;
+    }
+    
+    .extra-large-text {
+        font-size: 1.125rem;
+    }
+    
+    .button-large {
+        padding: 12px 20px;
+        font-size: 1rem;
+    }
+    
+    .form-input-large {
+        padding: 12px 14px;
+        font-size: 1rem;
+    }
+}
+
+/* 접근성 개선 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+    .form-input-large {
+        border-width: 3px;
+    }
+    
+    .button-large {
+        border: 2px solid currentColor;
+    }
+}
+
+/* 포커스 표시 개선 */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 3px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* 스크롤바 스타일링 */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* 프린트 스타일 */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #d1d5db !important;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+}
+
+/* 다크모드 지원 (선택사항) */
+@media (prefers-color-scheme: dark) {
+    /* 다크모드 스타일은 향후 추가 가능 */
+}

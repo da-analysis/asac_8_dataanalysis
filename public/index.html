@@ -1,0 +1,256 @@
+
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        
+
+        <title>FRAI - 프랜차이즈 브랜드 추천 & 최신 뉴스 요약</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+          .industry-btn {
+            padding: 8px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: white;
+            color: #374151;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+          }
+          .industry-btn:hover {
+            border-color: #f97316;
+            background: #fff7ed;
+          }
+          .industry-btn.selected {
+            background: #f97316;
+            color: white;
+            border-color: #f97316;
+          }
+          .budget-btn {
+            padding: 8px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: white;
+            color: #374151;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+          }
+          .budget-btn:hover {
+            border-color: #f97316;
+            background: #fff7ed;
+          }
+          .budget-btn.selected {
+            background: #f97316;
+            color: white;
+            border-color: #f97316;
+          }
+          .submit-btn {
+            background: #f97316;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+          }
+          .submit-btn:hover {
+            background: #ea580c;
+          }
+          .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+          body {
+            background: #faf5f0;
+            font-family: 'Noto Sans KR', 'Pretendard', -apple-system, BlinkMacSystemFont,
+                        'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Apple SD Gothic Neo',
+                        'Noto Sans', 'Malgun Gothic', sans-serif;
+            font-weight: 400;
+          }
+          .form-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            color: #374151;
+            font-size: 14px;
+          }
+          .form-textarea {
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            color: #374151;
+            font-size: 14px;
+            resize: none;
+            width: 100%;
+          }
+        </style>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <!-- 헤더 -->
+        <header class="bg-white shadow-sm px-6 py-4">
+            <div class="flex items-center">
+                <img src="/static/frai-logo.png" alt="FRAI" class="w-12 h-12 mr-4">
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">FRAI</h1>
+                    <p class="text-sm text-gray-600">프랜차이즈 브랜드 추천 & 최신 뉴스 요약</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- 메인 컨텐츠 -->
+        <main class="max-w-4xl mx-auto px-6 py-8">
+            <!-- 브랜드 추천 조건 입력 -->
+            <section class="bg-white rounded-lg shadow-sm p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-6 text-gray-900 flex items-center">
+                    <span class="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center mr-2">
+                        <svg class="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+                        </svg>
+                    </span>
+                    브랜드 추천 조건 입력
+                </h2>
+                
+                <form id="recommendationForm" class="space-y-6">
+                    <!-- 업종 선택 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">업종</label>
+                        <div class="flex flex-wrap items-start gap-2" id="industryButtons">
+                            <button type="button" class="industry-btn" data-value="한식">한식</button>
+                            <button type="button" class="industry-btn" data-value="기타 외식">기타 외식</button>
+                            <button type="button" class="industry-btn" data-value="치킨">치킨</button>
+                            <button type="button" class="industry-btn" data-value="분식">분식</button>
+                            <button type="button" class="industry-btn" data-value="일식">일식</button>
+                            <button type="button" class="industry-btn" data-value="주점">주점</button>
+                            <button type="button" class="industry-btn" data-value="중식">중식</button>
+                            <button type="button" class="industry-btn" data-value="커피">커피</button>
+                            <button type="button" class="industry-btn" data-value="음료 (커피 외)">음료 (커피 외)</button>
+                            <button type="button" class="industry-btn" data-value="서양식">서양식</button>
+                            <button type="button" class="industry-btn" data-value="제과제빵">제과제빵</button>
+                            <button type="button" class="industry-btn" data-value="피자">피자</button>
+                            <button type="button" class="industry-btn" data-value="기타 외국식">기타 외국식</button>
+                            <button type="button" class="industry-btn" data-value="패스트푸드">패스트푸드</button>
+                            <button type="button" class="industry-btn" data-value="편의점">편의점</button>
+                            <button type="button" class="industry-btn industry-btn-other" data-value="기타">기타</button>
+                        </div>
+                        
+                        <!-- 기타 업종 선택 모달 -->
+                        <div id="otherIndustryModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                            <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+                                <h3 class="text-lg font-semibold mb-4">기타 업종 선택</h3>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4" id="otherIndustryButtons">
+                                    <!-- 기타 업종들이 여기에 동적으로 추가됩니다 -->
+                                </div>
+                                <div class="flex justify-end gap-2">
+                                    <button type="button" id="cancelOtherIndustry" class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50">
+                                        취소
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 지역 선택 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">지역</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <select id="sido" name="sido" class="form-select" required>
+                                <option value="">시/도 선택</option>
+                                <!-- 시도 옵션들이 JavaScript로 동적 생성됩니다 -->
+                            </select>
+                            <select id="sigungu" name="sigungu" class="form-select" required disabled>
+                                <option value="">시/도를 먼저 선택하세요</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 예산 선택 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">임대료&임대보증금 제외 창업비용</label>
+                        <div class="flex flex-wrap items-start gap-2" id="budgetButtons">
+                            <button type="button" class="budget-btn" data-value="3천만원이하">3천만원 이하</button>
+                            <button type="button" class="budget-btn" data-value="3천만원~6천만원">3천만원~6천만원</button>
+                            <button type="button" class="budget-btn" data-value="6천만원~8천만원">6천만원~8천만원</button>
+                            <button type="button" class="budget-btn" data-value="8천만원~1억">8천만원~1억</button>
+                            <button type="button" class="budget-btn" data-value="1억~1억5천만원">1억~1억5천만원</button>
+                            <button type="button" class="budget-btn" data-value="1억5천만원이상">1억5천만원 이상</button>
+                        </div>
+                    </div>
+
+                    <!-- 니즈사항 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">니즈사항 (선택사항)</label>
+                        <textarea id="needs" name="needs" rows="3" 
+                                  placeholder="창업 시 중요하게 생각하시는 점을 자유롭게 작성해주세요."
+                                  class="form-textarea"></textarea>
+                    </div>
+
+                    <!-- 제출 버튼 -->
+                    <div class="text-center pt-4">
+                        <button type="submit" id="submitBtn" class="submit-btn">
+                            <span id="submitText">추천 실행</span>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- 로딩 섹션 -->
+            <section id="loadingSection" class="hidden bg-white rounded-lg shadow-sm p-8 mb-8">
+                <div class="text-center">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mb-4"></div>
+                    <p class="text-gray-600">실제 Databricks 데이터를 기반으로 AI 분석 중...</p>
+                    <p class="text-sm text-gray-500 mt-2">약 2-3분 소요됩니다. 잠시만 기다려 주세요.</p>
+                    <div class="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-3">
+                        <p class="text-xs text-orange-700">
+                            🔍 실제 프랜차이즈 데이터 조회 중<br>
+                            🤖 AI 브랜드 분석 및 맞춤 추천 생성 중<br>
+                            📊 지역별 임대료 및 시장 데이터 분석 중
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 결과 섹션 -->
+            <section id="resultSection" class="hidden space-y-6">
+                <!-- 결과가 여기에 동적으로 추가됩니다 -->
+            </section>
+
+            <!-- 에러 섹션 -->
+            <section id="errorSection" class="hidden bg-red-50 border border-red-200 rounded-lg p-6">
+                <div class="flex items-center text-red-800">
+                    <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <div>
+                        <h3 class="font-semibold">분석 중 오류가 발생했습니다</h3>
+                        <p id="errorMessage" class="text-sm mt-1">다시 시도해 주세요.</p>
+                    </div>
+                </div>
+                <button onclick="resetForm()" class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">
+                    다시 시도
+                </button>
+            </section>
+        </main>
+
+        <!-- 푸터 -->
+        <footer class="bg-white border-t mt-16 py-8">
+            <div class="max-w-4xl mx-auto px-6 text-center">
+                <p class="text-sm text-gray-600">&copy; 2025 FRAI. 실제 Databricks 데이터 기반 분석 서비스입니다.</p>
+            </div>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script src="/static/app.js"></script>
+    </body>
+    </html>
+  
